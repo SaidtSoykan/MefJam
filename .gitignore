@@ -48,7 +48,7 @@
 
 # JetBrains Rider
 .idea/
-
+.vs/
 # Gradle settings
 .gradle/
 
