@@ -29,7 +29,7 @@ public class PlantTimeLoop : MonoBehaviour
     public List<HarvestStep> harvestSteps = new List<HarvestStep>();
 
     [SerializeField] private int currentStepIndex = 0;
-    
+    [SerializeField] private PlantRenderHandler renderer;
     private bool isHavestable = false;
     public bool isActive { get; set; }
     public bool IsHarvestable
@@ -38,7 +38,8 @@ public class PlantTimeLoop : MonoBehaviour
         set
         {
             isHavestable = value;
-            plantImage.color= isHavestable ? Color.green : Color.red;
+            //plantImage.color= isHavestable ? Color.green : Color.red;
+            renderer.SetColor(isHavestable ? Color.green : Color.white);
             transform.parent.GetComponent<RitualInputHandler>().CheckRitualEnd();
         }
 
@@ -74,6 +75,7 @@ public class PlantTimeLoop : MonoBehaviour
         UpdateInstability(dt);
         CheckHarvestProgress();
         UpdateUI();
+        renderer.SetGrowthVisual(timelineSlider.value);
     }
     
 
