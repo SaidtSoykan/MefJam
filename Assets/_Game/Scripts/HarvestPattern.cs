@@ -1,0 +1,22 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+[CreateAssetMenu(fileName = "HarvestPattern", menuName = "TimeGarden/HarvestPattern")]
+public class HarvestPattern : ScriptableObject
+{
+    public List<HarvestStep> steps = new List<HarvestStep>();
+}
+
+[System.Serializable]
+public class HarvestStep
+{
+    public float minPercent; // 0..100
+    public float maxPercent; // 0..100
+
+    // optional: enforce that this step must be achieved while moving forward or reverse
+    public enum StepDirection { Any, Forward, Reverse }
+    public StepDirection requiredDirection = StepDirection.Any;
+
+    // convenience:
+    public bool Contains(float percent) => percent >= minPercent && percent <= maxPercent;
+}
