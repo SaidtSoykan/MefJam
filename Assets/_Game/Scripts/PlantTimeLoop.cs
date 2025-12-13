@@ -30,6 +30,8 @@ public class PlantTimeLoop : MonoBehaviour
 
     [SerializeField] private int currentStepIndex = 0;
     [SerializeField] private PlantRenderHandler renderer;
+    [SerializeField] private PlantParticleController particleController;
+    
     private bool isHavestable = false;
     public bool isActive { get; set; }
     public bool IsHarvestable
@@ -42,7 +44,6 @@ public class PlantTimeLoop : MonoBehaviour
             renderer.SetColor(isHavestable ? Color.green : Color.white);
             transform.parent.GetComponent<RitualInputHandler>().CheckRitualEnd();
         }
-
     } 
 
     [Header("=== UI (Optional) ===")]
@@ -50,18 +51,71 @@ public class PlantTimeLoop : MonoBehaviour
     public Image instabilityFill;
     public Image harvestImage;
     public Image plantImage;
-
+    private RitualInputHandler player;
     // Runtime state
-    public bool IsReversing { get; private set; }
+   public bool _isReversing;
+   public bool _isGrowing;
+   public bool _isBeingAbsorbed;
+
+    public bool IsReversing
+    {
+        get => _isReversing;
+        private set
+        {
+            if (value == _isReversing)
+                return;
+
+            _isReversing = value;
+            if (IsGrowing == value)
+            {
+                IsGrowing = !value;
+            }
+            particleController.Play(value, PlantParticleController.PlantState.Reversing);
+        }
+    }
+
+    public bool IsGrowing
+    {
+        get => _isGrowing;
+        private set
+        {
+            if (value == _isGrowing)
+                return;
+
+            _isGrowing = value;
+            if (IsReversing == value)
+            {
+                IsReversing = !value;
+            }
+            particleController.Play(value, PlantParticleController.PlantState.Growing);
+        }
+    }
+
+    public bool IsBeingAbsorbed
+    {
+        get => _isBeingAbsorbed;
+        set
+        {
+            if (value == _isBeingAbsorbed)
+                return;
+
+            _isBeingAbsorbed = value;
+            particleController.Play(value, PlantParticleController.PlantState.Absorbing);
+        }
+    }
+
+    
     private float explodeCooldownTimer = 0f;
 
     // ------------------ UPDATE ------------------
 
     private void Start()
     {
+        player = FindObjectOfType<RitualInputHandler>();
         Canvas.ForceUpdateCanvases();
         PositionHarvestImage();
         isActive = true;
+        IsGrowing = true;
     }
 
     private void Update()
@@ -73,11 +127,23 @@ public class PlantTimeLoop : MonoBehaviour
         UpdateCooldown(dt);
         UpdateTimeline(dt);
         UpdateInstability(dt);
+        UpdateAbsorption(dt);
         CheckHarvestProgress();
         UpdateUI();
         renderer.SetGrowthVisual(timelineSlider.value);
     }
-    
+
+    private void UpdateAbsorption(float dt)
+    {
+        if(!IsBeingAbsorbed)
+            return;
+        float absorbed = AbsorbInstability(
+            dt,
+            player.playerAbsorbCapacityPerSecond
+        );
+        player.AddPlayerInstability(absorbed);
+    }
+
 
     // ------------------ TIME ------------------
 
@@ -129,7 +195,6 @@ public class PlantTimeLoop : MonoBehaviour
             playerCapacityPerSecond * dt,
             instability
         );
-
         instability -= amount;
         return amount;
     }
@@ -160,7 +225,6 @@ public class PlantTimeLoop : MonoBehaviour
         
         if (step.Contains(timelinePercent))
         {
-            print("girdin bro");
             if (currentStepIndex < harvestSteps.Count - 1)
             {
                 currentStepIndex++;
@@ -190,7 +254,12 @@ public class PlantTimeLoop : MonoBehaviour
 
     public void SetReversing(bool value)
     {
+        print(value ? "reversed" : "not reversed");
         IsReversing = value;
+    }
+    public void SetAbsorbing(bool value)
+    {
+        IsBeingAbsorbed = value;
     }
 
     // ------------------ UI ------------------
@@ -251,4 +320,5 @@ public class PlantTimeLoop : MonoBehaviour
 
     public float TimelinePercent => timelinePercent;
     public float Instability => instability;
+    
 }

@@ -13,7 +13,6 @@ public class RitualInputHandler : MonoBehaviour
     [Header("Absorption")]
     public float playerAbsorbCapacityPerSecond = 30f;
 
-    private PlantTimeLoop selectedPlant;
     private List<PlantTimeLoop> plants = new List<PlantTimeLoop>();
     public bool isRitualOn { get; set; }
     void Update()
@@ -21,62 +20,10 @@ public class RitualInputHandler : MonoBehaviour
         if(!isRitualOn)
             return;
         //fore collider systems
-        //HandleSelection();
         //for keyboard plant control
         
-        HandlePlantInput();
+        //HandlePlantInput();
         //works in default ui system                                    
-        HandleReverse();
-        HandleAbsorb();
-    }
-    
-    
-    void HandleSelection()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                PlantTimeLoop plant = hit.collider.GetComponentInParent<PlantTimeLoop>();
-                if (plant != null)
-                {
-                    SelectPlant(plant);
-                }
-            }
-        }
-    }
-
-    void HandleReverse()
-    {
-        if (selectedPlant == null) return;
-
-        bool reversing = Input.GetMouseButton(0);
-        selectedPlant.SetReversing(reversing);
-    }
-
-    void HandleAbsorb()
-    {
-        if (selectedPlant == null) return;
-        if (!Input.GetMouseButton(1)) return;
-
-        float dt = Time.deltaTime;
-
-        float transferred = selectedPlant.AbsorbInstability(dt, playerAbsorbCapacityPerSecond);
-        playerInstability += transferred;
-
-        if (playerInstability >= playerInstabilityMax)
-        {
-            FailRitual();
-        }
-    }
-
-    void SelectPlant(PlantTimeLoop plant)
-    {
-        if (selectedPlant != null)
-            selectedPlant.SetReversing(false);
-
-        selectedPlant = plant;
     }
 
     void FailRitual()
@@ -84,13 +31,6 @@ public class RitualInputHandler : MonoBehaviour
         Debug.Log("RITUAL FAILED: Player instability maxed.");
         playerInstability = 0f;
         // Reset ritual here
-    }
-    public void SelectPlantFromUI(PlantTimeLoop plant)
-    {
-        if (selectedPlant != null)
-            selectedPlant.SetReversing(false);
-
-        selectedPlant = plant;
     }
 
     public void AddPlayerInstability(float amount)
