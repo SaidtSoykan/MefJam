@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class PlantTimeLoop : MonoBehaviour
 {
@@ -29,8 +30,8 @@ public class PlantTimeLoop : MonoBehaviour
     public List<HarvestStep> harvestSteps = new List<HarvestStep>();
 
     [SerializeField] private int currentStepIndex = 0;
-    [SerializeField] private PlantRenderHandler renderer;
-    [SerializeField] private PlantParticleController particleController;
+    [SerializeField] public PlantMeshController _MeshControllerrenderer;
+    [SerializeField] public PlantParticleController particleController;
     
     private bool isHavestable = false;
     public bool isActive { get; set; }
@@ -41,7 +42,6 @@ public class PlantTimeLoop : MonoBehaviour
         {
             isHavestable = value;
             //plantImage.color= isHavestable ? Color.green : Color.red;
-            renderer.SetColor(isHavestable ? Color.green : Color.white);
             transform.parent.GetComponent<RitualInputHandler>().CheckRitualEnd();
         }
     } 
@@ -116,6 +116,7 @@ public class PlantTimeLoop : MonoBehaviour
         PositionHarvestImage();
         isActive = true;
         IsGrowing = true;
+        _MeshControllerrenderer.ResetAndAssignGrowth(harvestSteps[currentStepIndex]);
     }
 
     private void Update()
@@ -130,7 +131,7 @@ public class PlantTimeLoop : MonoBehaviour
         UpdateAbsorption(dt);
         CheckHarvestProgress();
         UpdateUI();
-        renderer.SetGrowthVisual(timelineSlider.value);
+        _MeshControllerrenderer.ApplyGrowth(timelineSlider.value);
     }
 
     private void UpdateAbsorption(float dt)
@@ -228,6 +229,7 @@ public class PlantTimeLoop : MonoBehaviour
             if (currentStepIndex < harvestSteps.Count - 1)
             {
                 currentStepIndex++;
+                _MeshControllerrenderer.ChangeHarvestStep(harvestSteps[currentStepIndex],timelineSlider.value );
                 PositionHarvestImage();
                 return;
             }
@@ -248,6 +250,7 @@ public class PlantTimeLoop : MonoBehaviour
         currentStepIndex = 0;
         PositionHarvestImage();
         IsHarvestable = false;
+        _MeshControllerrenderer.ResetAndAssignGrowth(harvestSteps[currentStepIndex]);
     }
 
     // ------------------ INPUT API ------------------
@@ -288,7 +291,7 @@ public class PlantTimeLoop : MonoBehaviour
         RectTransform sliderRect = timelineSlider.GetComponent<RectTransform>();
         RectTransform imageRect = harvestImage.rectTransform;
 
-        float sliderWidth = sliderRect.rect.width;
+        float sliderWidth = sliderRect.rect.width-40f;
 
         // Safety clamps
         minPercent = Mathf.Clamp(minPercent, 0f, 100f);
@@ -314,10 +317,7 @@ public class PlantTimeLoop : MonoBehaviour
         pos.x = centerX;
         imageRect.anchoredPosition = pos;
     }
-
-
-    // ------------------ INSPECTOR HELPERS ------------------
-
+    
     public float TimelinePercent => timelinePercent;
     public float Instability => instability;
     
