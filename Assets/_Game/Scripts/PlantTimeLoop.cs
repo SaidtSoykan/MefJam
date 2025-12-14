@@ -109,14 +109,17 @@ public class PlantTimeLoop : MonoBehaviour
 
     // ------------------ UPDATE ------------------
 
-    private void Start()
+    public void Start()
     {
         player = FindObjectOfType<RitualInputHandler>();
         Canvas.ForceUpdateCanvases();
-        PositionHarvestImage();
         isActive = true;
         IsGrowing = true;
         _MeshControllerrenderer.ResetAndAssignGrowth(harvestSteps[currentStepIndex]);
+        timelinePercent = 0;
+        instability = 0;
+        currentStepIndex = 0;
+        PositionHarvestImage();
     }
 
     private void Update()

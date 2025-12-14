@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class RitualInputHandler : MonoBehaviour
 {
+    [SerializeField] private Slider playerInstabilitySlider;
     [Header("Player Instability")]
     public float playerInstabilityMax = 100f;
     public float playerInstability = 0f;
@@ -25,12 +28,17 @@ public class RitualInputHandler : MonoBehaviour
     {
         Debug.Log("RITUAL FAILED: Player instability maxed.");
         playerInstability = 0f;
+        foreach (var plant in plants)
+        {
+            plant.Start();
+        }
         // Reset ritual here
     }
 
     public void AddPlayerInstability(float amount)
     {
         playerInstability += amount;
+        playerInstabilitySlider.value = playerInstability / playerInstabilityMax;
         if (playerInstability >= playerInstabilityMax)
             FailRitual();
     }
