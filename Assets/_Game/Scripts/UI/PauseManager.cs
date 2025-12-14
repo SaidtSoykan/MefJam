@@ -1,46 +1,37 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Sahne geçiþleri için þart
+using UnityEngine.SceneManagement;
 
 public class PauseManager : MonoBehaviour
 {
-    public static bool GameIsPaused = false; // Diðer scriptlerden eriþmek istersen diye static yaptýk
+    public static bool GameIsPaused = false;
 
     [Header("UI Elemanlarý")]
     public GameObject pauseMenuPanel;
-    public GameObject pauseButton; 
+    public GameObject pauseButton;
     public GameObject optionsPanel;
-    void Awake()
-    {
-        GameIsPaused = false;
-        Time.timeScale = 1f;
-    }
+
+    [Header("Sahne Ayarlarý")]
+    // Bu kutucuðu Inspector'da göreceksin. 
+    // TPS sahnesinde ÝÞARETLE, Mini Game sahnesinde ÝÞARETÝ KALDIR.
+    public bool lockCursorOnResume = true;
+
     void Update()
     {
-        // ESC tuþuna basýnca da açýlsýn
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameIsPaused)
-            {
-                Resume();
-            }
-            else
-            {
-                Pause();
-            }
+            if (GameIsPaused) Resume();
+            else Pause();
         }
     }
 
-    // --- BUTON FONKSÝYONLARI ---
-
     public void Pause()
     {
-        pauseMenuPanel.SetActive(true); // Menüyü aç
-        pauseButton.SetActive(false);   // Küçük butonu gizle
-
-        Time.timeScale = 0f; // ZAMANI DURDUR
+        pauseMenuPanel.SetActive(true);
+        pauseButton.SetActive(false);
+        Time.timeScale = 0f;
         GameIsPaused = true;
 
-        // Mouse imlecini serbest býrak ve göster
+        // Pause modunda mouse her zaman serbest olmalý (Menüyü kullanmak için)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -48,31 +39,41 @@ public class PauseManager : MonoBehaviour
     public void Resume()
     {
         pauseMenuPanel.SetActive(false);
-        optionsPanel.SetActive(false); // Eðer ayarlar açýksa onu da kapat
+        if (optionsPanel != null) optionsPanel.SetActive(false);
         pauseButton.SetActive(true);
 
-        Time.timeScale = 1f; // ZAMANI TEKRAR AKIT
+        Time.timeScale = 1f;
         GameIsPaused = false;
 
-        // Mouse imlecini tekrar kilitle ve gizle (TPS oyunu olduðu için)
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // --- DEÐÝÞÝKLÝK BURADA ---
+        // Eðer bu bir TPS sahnesiyse kilitle, Mini Game ise serbest býrak
+        if (lockCursorOnResume)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            // Mini game için serbest kalmaya devam etsin
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 
     public void LoadMainMenu()
     {
-        // Ana menüye dönerken zamanýn donuk kalmadýðýndan emin olmalýyýz
         Time.timeScale = 1f;
-        SceneManager.LoadScene(0); // Build Settings'de Main Menu genelde 0. sýradadýr
+        GameIsPaused = false;
+        SceneManager.LoadScene(0);
     }
 
     public void OpenOptions()
     {
-        pauseMenuPanel.SetActive(false); // Pause menüsünü gizle
-        optionsPanel.SetActive(true);    // Ayarlarý aç
+        pauseMenuPanel.SetActive(false);
+        optionsPanel.SetActive(true);
     }
 
-    public void CloseOptions() // Ayarlar içindeki "Geri" butonu için
+    public void CloseOptions()
     {
         optionsPanel.SetActive(false);
         pauseMenuPanel.SetActive(true);

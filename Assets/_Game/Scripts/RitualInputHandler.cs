@@ -18,7 +18,17 @@ public class RitualInputHandler : MonoBehaviour
 
     private List<PlantTimeLoop> plants = new List<PlantTimeLoop>();
     public bool isRitualOn { get; set; }
+    void Start()
+    {
+        // ... Var olan kodların burada durabilir ...
 
+        // --- MOUSE AYARLARI ---
+        Cursor.lockState = CursorLockMode.None; // İmleci serbest bırak
+        Cursor.visible = true; // İmleci görünür yap
+
+        // Her ihtimale karşı zamanın aktığından emin ol
+        Time.timeScale = 1f;
+    }
     private void Update()
     {
         //HandlePlantInput();

@@ -4,11 +4,16 @@ using UnityEngine.Audio;
 
 public class MainMenuController : MonoBehaviour
 {
-    public AudioMixer mainMixer; 
+    public AudioMixer mainMixer;
 
     public void PlayGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        // YENÝ EKLENEN SATIR: Oyunu en baþtan baþlat (Level 1'e çek)
+        PlayerPrefs.SetInt("PlayerLevel", 1);
+        PlayerPrefs.Save();
+
+        // WelcomeScene sahnesini yükle (Build Index veya Ýsimle)
+        SceneManager.LoadScene("WelcomeScene");
     }
 
     public void QuitGame()
