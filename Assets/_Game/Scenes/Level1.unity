@@ -19167,8 +19167,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904cf067c58841f49bebbfecdd45e148, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loopDuration: 13
-  reverseSpeedMultiplier: 1.5
+  loopDuration: 18
+  reverseSpeedMultiplier: 1.6
   timelinePercent: 0
   instabilityMax: 100
   instabilityGrowPerSecond: 10
@@ -19176,8 +19176,8 @@ MonoBehaviour:
   instability: 0
   explodeCooldownSeconds: 1
   harvestSteps:
-  - minPercent: 30
-    maxPercent: 50
+  - minPercent: 42
+    maxPercent: 69
   currentStepIndex: 0
   _MeshControllerrenderer: {fileID: 1456350263}
   particleController: {fileID: 1844540907}

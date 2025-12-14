@@ -19215,7 +19215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loopDuration: 19
-  reverseSpeedMultiplier: 1.2
+  reverseSpeedMultiplier: 1.6
   timelinePercent: 0
   instabilityMax: 100
   instabilityGrowPerSecond: 10
