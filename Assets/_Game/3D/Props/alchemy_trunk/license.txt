@@ -1,0 +1,11 @@
+Model Information:
+* title:	Alchemy Trunk
+* source:	https://sketchfab.com/3d-models/alchemy-trunk-018dc64f2f87402c87419d2d7cebfdeb
+* author:	khalitirkai (https://sketchfab.com/khalitirkai)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Alchemy Trunk" (https://sketchfab.com/3d-models/alchemy-trunk-018dc64f2f87402c87419d2d7cebfdeb) by khalitirkai (https://sketchfab.com/khalitirkai) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
