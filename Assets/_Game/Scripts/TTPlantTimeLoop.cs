@@ -4,123 +4,20 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using DG.Tweening;
 
-public class PlantTimeLoop : MonoBehaviour
+public class TTPlantTimeLoop : PlantTimeLoop
 {
-    [Header("=== TIME LOOP ===")]
-    [Tooltip("Seconds to go from 0% to 100%")]
-    public float loopDuration = 10f;
-
-    [Tooltip("Multiplier applied to forward speed when reversing")]
-    public float reverseSpeedMultiplier = 1.2f;
-
-    [Range(0f, 100f)]
-    [SerializeField]
-    public float timelinePercent = 0f;
-
-    [Header("=== INSTABILITY ===")]
-    public float instabilityMax = 100f;
-    public float instabilityGrowPerSecond = 10f;
-    public float absorbRatePerSecond = 20f;
-
-    [SerializeField] public float instability = 0f;
-
-    [Header("Explosion Cooldown")]
-    public float explodeCooldownSeconds = 1.0f;
-
-    [Header("=== HARVEST PATTERN ===")]
-    public List<HarvestStep> harvestSteps = new List<HarvestStep>();
-
-    [SerializeField] public int currentStepIndex = 0;
-    [SerializeField] public PlantMeshController _MeshControllerrenderer;
-    [SerializeField] public PlantParticleController particleController;
-    
-    private bool isHavestable = false;
-    public bool isActive { get; set; }
-    public bool IsHarvestable
-    {
-        get => isHavestable;
-        set
-        {
-            isHavestable = value;
-            //plantImage.color= isHavestable ? Color.green : Color.red;
-            transform.parent.GetComponent<RitualInputHandler>().CheckRitualEnd();
-        }
-    } 
-
-    [Header("=== UI (Optional) ===")]
-    public Slider timelineSlider;
-    public Image instabilityFill;
-    public Image harvestImage;
-    public Image plantImage;
-
-    public RitualInputHandler player;
-    // Runtime state
-   public bool _isReversing;
-   public bool _isGrowing;
-   public bool _isBeingAbsorbed;
-
-    public bool IsReversing
-    {
-        get => _isReversing;
-        set
-        {
-            if (value == _isReversing)
-                return;
-
-            _isReversing = value;
-            if (IsGrowing == value)
-            {
-                IsGrowing = !value;
-            }
-            particleController.Play(value, PlantParticleController.PlantState.Reversing);
-        }
-    }
-
-    public bool IsGrowing
-    {
-        get => _isGrowing;
-        set
-        {
-            if (value == _isGrowing)
-                return;
-
-            _isGrowing = value;
-            if (IsReversing == value)
-            {
-                IsReversing = !value;
-            }
-            particleController.Play(value, PlantParticleController.PlantState.Growing);
-        }
-    }
-
-    public bool IsBeingAbsorbed
-    {
-        get => _isBeingAbsorbed;
-        set
-        {
-            if (value == _isBeingAbsorbed)
-                return;
-
-            _isBeingAbsorbed = value;
-            particleController.Play(value, PlantParticleController.PlantState.Absorbing);
-        }
-    }
-
-
-    public float explodeCooldownTimer = 0f;
-
-    // ------------------ UPDATE ------------------
-
     public void Start()
     {
         player = FindObjectOfType<RitualInputHandler>();
         Canvas.ForceUpdateCanvases();
         isActive = true;
         IsGrowing = true;
+        currentStepIndex = 0;
+        print(harvestSteps.Count);
+        print(currentStepIndex);
         _MeshControllerrenderer.ResetAndAssignGrowth(harvestSteps[currentStepIndex]);
         timelinePercent = 0;
         instability = 0;
-        currentStepIndex = 0;
         PositionHarvestImage();
     }
 
@@ -152,7 +49,21 @@ public class PlantTimeLoop : MonoBehaviour
 
 
     // ------------------ TIME ------------------
-
+    public TutorialManager ttManager;
+    
+    public TutorialManager TutorialManager
+    {
+        get
+        {
+            if (ttManager == null)
+            {
+                ttManager = FindObjectOfType<TutorialManager>();
+            }
+            return ttManager;
+        }
+        set { ttManager = value; }
+    }
+    
     void UpdateTimeline(float dt)
     {
         float forwardSpeed = 100f / Mathf.Max(0.001f, loopDuration);
@@ -164,7 +75,8 @@ public class PlantTimeLoop : MonoBehaviour
         }
         else
         {
-            timelinePercent += forwardSpeed * dt;
+            if(TutorialManager.isGrowingOn) 
+                timelinePercent += forwardSpeed * dt;
         }
 
         // Clamp
@@ -225,6 +137,8 @@ public class PlantTimeLoop : MonoBehaviour
 
     void CheckHarvestProgress()
     {
+        if(!TutorialManager.isProgressOn)
+            return;
         if(harvestSteps.Count == 0)
             return;
         HarvestStep step = harvestSteps[currentStepIndex];
