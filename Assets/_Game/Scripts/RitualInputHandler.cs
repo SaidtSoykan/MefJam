@@ -15,15 +15,10 @@ public class RitualInputHandler : MonoBehaviour
 
     private List<PlantTimeLoop> plants = new List<PlantTimeLoop>();
     public bool isRitualOn { get; set; }
-    void Update()
+
+    private void Update()
     {
-        if(!isRitualOn)
-            return;
-        //fore collider systems
-        //for keyboard plant control
-        
         //HandlePlantInput();
-        //works in default ui system                                    
     }
 
     void FailRitual()
@@ -63,6 +58,8 @@ public class RitualInputHandler : MonoBehaviour
             foreach (var plant in plants)
             {
                 plant.isActive = false;
+                plant.particleController.GiveGameEndReward();
+                plant._MeshControllerrenderer.QuicklyFadeOut(plant.timelineSlider);
             }
             isRitualOn = false;
         }
@@ -71,18 +68,23 @@ public class RitualInputHandler : MonoBehaviour
     private readonly KeyCode[] plantKeys =
     {
         KeyCode.Q,
-        KeyCode.U,
         KeyCode.W,
-        KeyCode.I,
         KeyCode.E,
-        KeyCode.O,
         KeyCode.R,
-        KeyCode.P
+        // KeyCode.Q,
+        // KeyCode.U,
+        // KeyCode.W,
+        // KeyCode.I,
+        // KeyCode.E,
+        // KeyCode.O,
+        // KeyCode.R,
+        // KeyCode.P
     };
 
     private void HandlePlantInput()
     {
         bool spaceHeld = Input.GetKey(KeyCode.Space);
+        bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
         for (int i = 0; i < plants.Count && i < plantKeys.Length; i++)
         {
@@ -90,27 +92,52 @@ public class RitualInputHandler : MonoBehaviour
             KeyCode key = plantKeys[i];
 
             bool keyHeld = Input.GetKey(key);
+            bool keyDown = Input.GetKeyDown(key);
 
-            // --- Time reversal logic ---
-            if (keyHeld && plant.isActive)
+            // --- SHIFT + KEY → TOGGLE ACTIVE ---
+            if (shiftHeld && keyDown)
             {
-                plant.SetReversing(true);
+                plant.isActive = !plant.isActive;
+
+                // Force clear states when deactivated
+                if (!plant.isActive)
+                {
+                    plant.SetReversing(false);
+                    plant.SetAbsorbing(false);
+                }
+
+                continue;
             }
-            else
+
+            // Ignore inactive plants
+            if (!plant.isActive)
             {
                 plant.SetReversing(false);
+                plant.SetAbsorbing(false);
+                continue;
             }
 
-            // --- Space override logic ---
+            // --- SPACE + KEY → ABSORB ---
             if (spaceHeld && keyHeld)
             {
-                plant.isActive = false;
+                plant.SetAbsorbing(true);
+                plant.SetReversing(false);
+                continue;
             }
-            else
+
+            // --- KEY ONLY → REVERSE ---
+            if (keyHeld)
             {
-                plant.isActive = true;
+                plant.SetReversing(true);
+                plant.SetAbsorbing(false);
+                continue;
             }
+
+            // --- IDLE ---
+            plant.SetReversing(false);
+            plant.SetAbsorbing(false);
         }
     }
+
 
 }

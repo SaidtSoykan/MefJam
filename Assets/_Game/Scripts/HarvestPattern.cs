@@ -12,11 +12,7 @@ public class HarvestStep
 {
     public float minPercent; // 0..100
     public float maxPercent; // 0..100
+    public bool isActive { get; set; }
 
-    // optional: enforce that this step must be achieved while moving forward or reverse
-    public enum StepDirection { Any, Forward, Reverse }
-    public StepDirection requiredDirection = StepDirection.Any;
-
-    // convenience:
     public bool Contains(float percent) => percent >= minPercent && percent <= maxPercent;
 }

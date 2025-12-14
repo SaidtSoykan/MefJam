@@ -11,9 +11,25 @@ public class PlantUIInput : MonoBehaviour,
 
     private bool isHovering;
     
+    private RitualInputHandler ritualInputHandler;
+
+    public RitualInputHandler RitualInputHandler
+    {
+        get
+        {
+            if (ritualInputHandler == null)
+            {
+                ritualInputHandler = FindObjectOfType<RitualInputHandler>();
+            }
+            return ritualInputHandler;
+        }
+        set { ritualInputHandler = value; }
+    }
+    
     public void OnPointerDown(PointerEventData eventData)
     {
-        print("tıkladın");
+        if (!RitualInputHandler.isRitualOn)
+            return;
         if (eventData.button == PointerEventData.InputButton.Left)
             plant.SetReversing(true);
         if (eventData.button == PointerEventData.InputButton.Right)
@@ -22,6 +38,8 @@ public class PlantUIInput : MonoBehaviour,
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (!RitualInputHandler.isRitualOn)
+            return;
         if (eventData.button == PointerEventData.InputButton.Left)
             plant.SetReversing(false);
         if (eventData.button == PointerEventData.InputButton.Right)
